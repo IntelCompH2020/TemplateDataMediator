@@ -9,6 +9,7 @@ import com.citesa.trivials.string;
 import com.citesa.trivials.types.LogMessage;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
+import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 
 import java.io.IOException;
 import java.net.URI;
@@ -23,52 +24,51 @@ public class Arguments extends ProgramArgumentsBase {
     }
 
     /* Data input options */
-    @Option(name = "-ds", usage = "Dataset Id")
-    public String datasetId = null;
+    @Option(name = "-dsmap", handler = StringArrayOptionHandler.class, usage = "Dataset mapping (if absent, the ordinal is utilized)")
+    public List<String> datasetMap = null;
 
-    /* Data input options */
-    @Option(name = "-fsds", usage = "Dataset Location")
-    public String datasetLocation = null;
+    @Option(name = "-ds", handler = StringArrayOptionHandler.class, usage = "Dataset Id(s)")
+    public List<String> datasetIds = null;
+
+    @Option(name = "-fsds", handler = StringArrayOptionHandler.class, usage = "Dataset Location(s)")
+    public List<String> datasetLocations = null;
 
 
-    @Option(name = "-bl", usage = "Base location override")
-    public String baseLocation = null;
+    @Option(name = "-bl", usage = "Base location(s) override")
+    public List<String> baseLocations = null;
 
     /* Data output options */
-    @Option(name = "-ol", aliases = "--outlocation", usage = "Output Location (kafka endpoint, hdfs location, local path")
-    public String outputLocation = null;
+    @Option(name = "-ol", aliases = "--outlocations", handler = StringArrayOptionHandler.class, usage = "Output Location (kafka endpoint, hdfs location, local path")
+    public List<String> outputLocations = null;
 
-    @Option(name = "-oo", aliases = "--outoption", usage = "Output Options (utilized according to output mode) ")
-    public String outputOptions = null;
-
-    @Option(name = "-om", aliases = "-outmode", usage = "Output Mode: (kafka, ...)" )
-    public String outMode = null;
+    @Option(name = "-oo", aliases = "--outoption", handler = StringArrayOptionHandler.class,  usage = "Output Options (utilized according to output mode). Format: option=value")
+    public List<String> outputOptions = null;
 
     /**
-     * A file containing query arguments. The format is standard json in an object containing all arguments as arg/name.
-     * Arguments supplied in the file need to be tackled by the specific mediator Argument class.
+     * A file containing query template arguments. The format is defined by the SparkSQLComposer component.
      */
-    @Option(name = "-q_af", usage = "Query arguments file")
-    public String queryArgumentsFile = null;
+    @Option(name = "-qta", usage = "Query template arguments file")
+    public String queryTemplateArgumentsFile = null;
 
     /**
-     * Query arguments supplied in the form arg_name=value||arg_name=value
-     * Arguments supplied via the method need to be tackled by the specific mediator Argument class.
+     * A file containing query template. The format is defined by the SparkSQLComposer component.
      */
-    @Option(name = "-q_al", usage = "Query Arguments List in format arg_name=value||arg_name=value")
-    public String queryArgumentsList = null;
+    @Option(name = "-qt", usage = "Query Template File")
+    public String queryTemplateFile = "";
+
+    /**
+     * Additional query arguments supplied in the form arg_name=value
+     * Arguments supplied via the method are passed to the SparkSQLComposer in addition to the template file.
+     */
+    @Option(name = "-qa",handler = StringArrayOptionHandler.class, usage = "Query Arguments in format argument_name=value")
+    public List<String> queryArguments = null;
+
 
     @Option(name = "-reg", usage = "Register Output")
     public boolean registerOut = false;
 
-    @Option(name = "-qt", usage = "Query Template")
-    public String queryTemplate = "";
-
-    @Option(name = "-tmp",usage = "Temporary files location")
+    @Option(name = "-tmp", usage = "Temporary files base location")
     public String tmpLocation = null;
-
-    @Option(name = "-cl", aliases = "--cachelocation", usage = "SubQuery cache location")
-    public String cacheLocation = null;
 
     @Option(name = "-explain",usage = "Explain query")
     public String explainQuery = null;

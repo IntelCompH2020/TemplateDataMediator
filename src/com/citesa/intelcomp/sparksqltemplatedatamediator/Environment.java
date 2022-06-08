@@ -40,49 +40,6 @@ public class Environment extends OperationEnvironmentBase  {
 		return (Arguments) super.getArguments();
 	}
 
-	public ArrayList<String> getDatasetIds()
-	{
-		throw  new NotImplementedException();
-	}
-	public ArrayList<String> getDatasetFSLocations()
-	{
-		throw  new NotImplementedException();
-	}
-	public ArrayList<String> getOutputLocations()
-	{
-		String sArg = this.getArguments().outputLocation;
-		throw  new NotImplementedException();
-		/*
-		if(sArg == null)
-			return
-					io.concatenatePaths(
-								this.getConfigManager().getDataSpaceConfigurationLocation(),
-								this.getConfigManager().getHDFSBasePath(),
-								this.getAppId(),
-								DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss").format(LocalDateTime.now()),
-								"/");
-		else if (sArg.toUpperCase() == "HDFSAUTO")
-		{
-			io.concatenatePaths(
-					this.getConfigManager().getDataSpaceConfigurationLocation(),
-					this.getConfigManager().getHDFSBasePath(),
-					this.getAppId(),
-					DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss").format(LocalDateTime.now()),
-					"/");
-		}
-		return sArg;
-
-		 */
-	}
-	
-	public String getOutputOption()
-	{
-		String sArg = this.getArguments().outputOptions;
-		if(sArg == null)
-			sArg = "default";
-		return sArg;						
-	}
-
 	public String getHDFSTmpPath() {
 		return getHDFSTmpPath("");
 	}
