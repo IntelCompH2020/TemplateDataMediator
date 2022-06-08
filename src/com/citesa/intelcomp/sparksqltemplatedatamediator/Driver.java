@@ -38,10 +38,7 @@ public class Driver {
                 spark.sparkContext().setLogLevel(opEnv.getLogLevel());
             }
 
-
-            Dataset<Row> dsOut = query.getDataSet(spark);
-
-            query.StoreDataSet(spark, dsOut);
+            query.ExecuteQuery(spark);
 
         }
         finally

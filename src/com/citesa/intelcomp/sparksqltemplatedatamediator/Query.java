@@ -171,7 +171,4 @@ public class Query {
         return tmpl ;
     }
 
-    public void StoreDataSet(SparkSession spark, Dataset<Row> dsOut) {
-        throw new NotImplementedException();
-    }
 }
