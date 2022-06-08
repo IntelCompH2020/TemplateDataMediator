@@ -2,6 +2,7 @@ package com.citesa.intelcomp.sparksqltemplatedatamediator;
 
 //import com.fasterxml.jackson.core.JsonProcessingException;
 //import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.SparkSession.Builder;
@@ -26,6 +27,7 @@ public class Driver {
         opEnv = new Environment(opArguments,appId,logger);
         Query query = new Query(opEnv);
 
+        opEnv.getLogger().log(Level.INFO, String.format("======Starting %s driver execution======", appId));
 
         //String sparkMaster = opEnv.getSparkMaster();
         try

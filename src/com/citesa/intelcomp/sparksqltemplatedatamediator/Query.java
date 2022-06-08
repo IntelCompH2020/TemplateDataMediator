@@ -71,6 +71,7 @@ public class Query {
     private void PrepareDataSink(SparkSession spark, DataSink ds)
     {
         //TODO: add code to prepare datasink parameters.
+        _opEnv.getLogger().log(Level.INFO, String.format("Preparing DataSink #%d [%s]",ds.tmpOrdinal, ds.id));
         ArrayList<KeyValuePair<String,String>> outlocations = _opEnv.getArguments().ParseOutputLocations();
         String location = ProgramArgumentsBase.GetParsedArgumentValueByKeyOrOrdinal(outlocations,ds.id, ds.tmpOrdinal);
         if(location == null )
@@ -89,6 +90,7 @@ public class Query {
     {
         //TODO: add code to prepare datasource parameters
         String location = null;
+        _opEnv.getLogger().log(Level.INFO, String.format("Preparing DataSource #%d [%s]",ds.tmpOrdinal, ds.id));
         ArrayList<KeyValuePair<String,String>> dsIds = _opEnv.getArguments().ParseDatasetIDs();
         //locating dataset by id
         if(dsIds.size()>0)
@@ -142,6 +144,7 @@ public class Query {
 
     private SparkSqlTemplate InitSparkSqlTemplate() throws URISyntaxException, IOException {
 
+        _opEnv.getLogger().log(Level.INFO, String.format("Reading query template from [%s]", _opEnv.getArguments().queryTemplateFile));
         SimpleFileReader fr =  SimpleFileReaderBase.getFileReader(
                 io.PathToURI( _opEnv.getArguments().queryTemplateFile)
         );
@@ -157,12 +160,13 @@ public class Query {
                 ConfigXml xCfg = null;
 
                 xCfg = new ConfigXml();
+                _opEnv.getLogger().log(Level.INFO, String.format("Reading query arguments from [%s]", configFile));
                 xCfg.Load(SimpleFileReaderBase.readAllFileText(new URI(configFile)));
 
                 Collection<String> fArgs = xCfg.getNodeNames("queryArguments");
                 for (String arg : fArgs) {
                     String value = xCfg.getValue("queryArguments/" + arg);
-                    _opEnv.getLogger().log( Priority.INFO, String.format("QueryArgument from file: [%s] =  %s", arg, value));
+                    _opEnv.getLogger().log( Level.INFO, String.format("QueryArgument from file: [%s] =  %s", arg, value));
                     tmpl.getArguments().put(arg, value);
                 }
                 //arg_explain = (xCfg.getValue("programArguments/explain") =="1");
