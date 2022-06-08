@@ -1,4 +1,4 @@
-package com.citesa.intelcomp.templatedatamediator;
+package com.citesa.intelcomp.sparksqltemplatedatamediator;
 
 //import com.fasterxml.jackson.core.JsonProcessingException;
 //import com.fasterxml.jackson.databind.ObjectMapper;

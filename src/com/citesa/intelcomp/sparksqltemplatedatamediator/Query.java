@@ -1,4 +1,4 @@
-package com.citesa.intelcomp.templatedatamediator;
+package com.citesa.intelcomp.sparksqltemplatedatamediator;
 
 import com.citesa.trivials.NotImplementedException;
 import com.citesa.trivials.io;
@@ -7,7 +7,6 @@ import com.citesa.intelcomp.infrahelper.SimpleFileReaderBase;
 import com.citesa.spark.sqlcomposer.*;
 
 import com.citesa.trivials.string;
-import com.citesa.trivials.types.Severity;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -19,7 +18,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 
 public class Query {
-    protected com.citesa.intelcomp.templatedatamediator.Environment _opEnv;
+    protected com.citesa.intelcomp.sparksqltemplatedatamediator.Environment _opEnv;
 
     public Query(Environment opEnv)
     {

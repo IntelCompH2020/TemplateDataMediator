@@ -1,19 +1,15 @@
-package com.citesa.intelcomp.templatedatamediator;
+package com.citesa.intelcomp.sparksqltemplatedatamediator;
 
 
 import com.citesa.intelcomp.clienttoolkit.OperationEnvironmentBase;
 import com.citesa.trivials.NotImplementedException;
-import com.citesa.trivials.types.Severity;
 import com.citesa.trivials.io;
 import com.citesa.trivials.types.LogMessage;
-import com.citesa.trivials.types.Verbosity;
 import org.apache.log4j.Logger;
 
-import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.UUID;
 
 public class Environment extends OperationEnvironmentBase  {

@@ -1,4 +1,4 @@
-package com.citesa.intelcomp.templatedatamediator;
+package com.citesa.intelcomp.sparksqltemplatedatamediator;
 
 
 import com.citesa.intelcomp.clienttoolkit.ProgramArgumentsBase;
