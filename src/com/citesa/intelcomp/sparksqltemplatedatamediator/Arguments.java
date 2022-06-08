@@ -6,6 +6,7 @@ import com.citesa.intelcomp.infrahelper.SimpleFileReaderBase;
 import com.citesa.trivials.config.ConfigJson;
 import com.citesa.trivials.config.ConfigXml;
 import com.citesa.trivials.string;
+import com.citesa.trivials.types.KeyValuePair;
 import com.citesa.trivials.types.LogMessage;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
@@ -33,9 +34,6 @@ public class Arguments extends ProgramArgumentsBase {
     @Option(name = "-fsds", handler = StringArrayOptionHandler.class, usage = "Dataset Location(s)")
     public List<String> datasetLocations = null;
 
-
-    @Option(name = "-bl", usage = "Base location(s) override")
-    public List<String> baseLocations = null;
 
     /* Data output options */
     @Option(name = "-ol", aliases = "--outlocations", handler = StringArrayOptionHandler.class, usage = "Output Location (kafka endpoint, hdfs location, local path")
@@ -73,158 +71,46 @@ public class Arguments extends ProgramArgumentsBase {
     @Option(name = "-explain",usage = "Explain query")
     public String explainQuery = null;
 
-    protected Hashtable<String, String> _argumentsFromFile = null;
-    /**
-     * Retrieves the arguments provided in the json file declared in queryArgumentsFile
-     * @return a dictionary with the arguments
-     */
-    public Hashtable<String, String > getArgumentsFromFile()
-    {
-        if(_argumentsFromFile !=null)
-            return _argumentsFromFile;
 
-        if(string.isNullOrEmpty(queryArgumentsFile))
-            return null;
 
-        _argumentsFromFile = new Hashtable<>();
-        String configPayload = null;
-        try {
-            configPayload = SimpleFileReaderBase.readAllFileText( new URI(queryArgumentsFile));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        if(queryArgumentsFile.endsWith(".json")) {
-            ConfigJson conf = new ConfigJson();
-            conf.Load(configPayload);
-            Collection<String> argNames = conf.getNodeNames();
-            if (argNames != null) {
-                for (String argName : argNames) {
-                    if (argName != null)
-                        _argumentsFromFile.put(argName, conf.getValueString(argName));
-                }
-            }
-        }
-        else if(queryArgumentsFile.endsWith(".xml")) {
-            ConfigXml conf = new ConfigXml();
-            conf.Load(configPayload);
-            Collection<String> argNames = conf.getNodeNames();
-            if (argNames != null) {
-                for (String argName : argNames) {
-                    if (argName != null)
-                        _argumentsFromFile.put(argName, conf.getValue(argName));
-                }
-            }
-        }
-        return _argumentsFromFile;
+    protected  ArrayList<KeyValuePair<String, String>> _parsedQueryArguments;
+    public ArrayList<KeyValuePair<String, String>> ParseQueryArguments() {
+        if(_parsedQueryArguments == null)
+            _parsedQueryArguments =  ProgramArgumentsBase.ParseCombinedArguments(this.queryArguments);
+        return _parsedQueryArguments;
     }
 
-    protected Hashtable<String, String> _argumentsFromList = null;
-    /**
-     * Retrieves the arguments provided in queryArgumentsList
-     * @return a dictionary with the arguments
-     */
-    public Hashtable<String, String> getArgumentsFromList()
-    {
-        if(_argumentsFromList!=null)
-            return  _argumentsFromList;
-
-        if(string.isNullOrEmpty(queryArgumentsList))
-            return null;
-
-        String[] args = queryArgumentsList.split("\\|\\|");
-        for (String arg : args) {
-            if(!string.isNullOrEmpty(arg))
-            {
-                String parts[] = arg.split("=",2);
-                if(parts.length == 2) {
-                    _argumentsFromList.put(parts[0].trim().toLowerCase(),parts[1]);
-                }
-            }
-
-        }
-        return _argumentsFromList;
+    protected  ArrayList<KeyValuePair<String, String>> _parsedDatasetIds;
+    public ArrayList<KeyValuePair<String, String>> ParseDatasetIDs() {
+        if( _parsedDatasetIds == null )
+            _parsedDatasetIds =  ProgramArgumentsBase.ParseCombinedArguments(this.datasetIds);
+        return _parsedDatasetIds;
     }
 
-    /**
-     * Retrieves the value of an argument provided in a file or in argument list
-     * Arguments in argument list take precedence over arguments in file.
-     * @param name the param to look for (case insensitive)
-     * @param defaultValue the value to return if no argument is found
-     * @return the string value of the argument or the defaultValue
-     */
-    public String getSupplementaryArgumentValue(String name, String defaultValue)
-    {
-        try
-        {
-            String v = getArgumentsFromList().get(name.toLowerCase());
-            if(v!=null)
-                return v;
-        }
-        catch(Exception ex)
-        {
 
-        }
-
-        try
-        {
-            String v = getArgumentsFromFile().get(name.toLowerCase());
-            if(v!=null)
-                return v;
-        }
-        catch(Exception ex)
-        {
-
-        }
-        return defaultValue;
+    protected  ArrayList<KeyValuePair<String, String>> _parsedDatasetLocations;
+    public ArrayList<KeyValuePair<String, String>> ParseDatasetLocations() {
+        if(_parsedDatasetLocations == null)
+            _parsedDatasetLocations = ProgramArgumentsBase.ParseCombinedArguments(this.datasetLocations);
+        return _parsedDatasetLocations;
     }
 
-    protected HashMap<String,String> _supplementaryArguments = null;
-    public HashMap<String,String> getSupplementaryArguments() {
-
-        if(_supplementaryArguments!=null)
-            return _supplementaryArguments;
-
-        Hashtable<String, String> listArgs = getArgumentsFromList();
-        Hashtable<String, String> fileArgs = getArgumentsFromFile();
-        _supplementaryArguments = new HashMap<String, String>();
-
-        if(listArgs!=null) {
-            while(listArgs.keys().hasMoreElements()) {
-                String key = listArgs.keys().nextElement();
-                _supplementaryArguments.put(key, listArgs.get(key));
-            }
-        }
-
-        if(fileArgs!=null) {
-            while(fileArgs.keys().hasMoreElements()) {
-                String key = fileArgs.keys().nextElement();
-                try {
-                    String v =  null;
-                    v = listArgs.get(key);
-                    if(v != null)
-                        _supplementaryArguments.put(key, v);
-                }
-                catch  (Exception ex)
-                {
-
-                }
-            }
-        }
-
-        return _supplementaryArguments;
+    protected ArrayList<KeyValuePair<String, String>> _parsedOutputLocations;
+    public ArrayList<KeyValuePair<String, String>> ParseOutputLocations() {
+        if(_parsedOutputLocations == null)
+            _parsedOutputLocations  = ProgramArgumentsBase.ParseCombinedArguments(this.datasetLocations);
+        return _parsedOutputLocations;
     }
-
 
     public ArrayList<LogMessage> PrintInfo(boolean onlyLocal) {
         ArrayList<LogMessage> info = new ArrayList<>();
         info.add( new LogMessage("----Core Arguments----"));
+        /*
         info.add( new LogMessage("Dataset Id : " + string.asPrintable( this.datasetId ) ));
         info.add( new LogMessage("Dataset FS Location: " + string.asPrintable( this.datasetLocation) ));
         info.add( new LogMessage("Output Location : " + string.asPrintable( this.outputLocation)));
         info.add( new LogMessage("Output Mode : " + string.asPrintable( this.outMode )));
+         */
         return  info;
     }
 
@@ -242,4 +128,5 @@ public class Arguments extends ProgramArgumentsBase {
         }
         return null;
     }
+
 }
