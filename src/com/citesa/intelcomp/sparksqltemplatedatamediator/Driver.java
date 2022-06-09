@@ -14,8 +14,8 @@ public class Driver {
 
     public static void main(String[] args) throws Exception {
 
-        Logger logger = Logger.getLogger("MainLogger");
-
+        Logger logger = Logger.getLogger("DataMediator");
+        logger.setLevel(Level.INFO); //Initial level: INFO
 
         /* Preparing operation environment for the execution */
         Arguments opArguments = new Arguments(args);
@@ -24,7 +24,7 @@ public class Driver {
         SparkSession spark = null;
 
                 //Preparing processing components
-        opEnv = new Environment(opArguments,appId,logger);
+        opEnv = new Environment(opArguments, appId, logger);
         Query query = new Query(opEnv);
 
         opEnv.getLogger().log(Level.INFO, String.format("======Starting %s driver execution======", appId));
@@ -40,6 +40,7 @@ public class Driver {
                 spark.sparkContext().setLogLevel(opEnv.getLogLevel());
             }
 
+            opEnv.getLogger().log(Level.INFO, String.format("======Starting %s query execution======", appId));
             query.ExecuteQuery(spark);
 
         }

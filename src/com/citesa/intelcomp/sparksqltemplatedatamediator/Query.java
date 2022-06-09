@@ -41,11 +41,11 @@ public class Query {
         //Read template
         SparkSqlTemplate sparkSqlTemplate = InitSparkSqlTemplate();
 
-
         //Pass command line arguments to query engine
 
         ArrayList<KeyValuePair<String,String>> args  =this._opEnv.getArguments().ParseQueryArguments();
         for (KeyValuePair<String,String> arg: args ) {
+            this._opEnv.getLogger().log(Level.INFO,String.format("CLI query argument [%s] = [%s]", arg.key, arg.value));
             if(!string.isNullOrEmpty((arg.key)))
                 sparkSqlTemplate.addArgument(arg.key, arg.value);
         }
@@ -55,7 +55,7 @@ public class Query {
         int ordinal=0;
         for (DataSource ds : sparkSqlTemplate.dataSources.values()) {
             ds.tmpOrdinal = ordinal++;
-           PrepareDataSource(spark, ds);
+            PrepareDataSource(spark, ds);
         }
 
         //Prepare data sinks
@@ -90,7 +90,7 @@ public class Query {
     {
         //TODO: add code to prepare datasource parameters
         String location = null;
-        _opEnv.getLogger().log(Level.INFO, String.format("Preparing DataSource #%d [%s]",ds.tmpOrdinal, ds.id));
+        _opEnv.getLogger().log(Level.INFO, String.format("Preparing DataSource #%d [%s]. Name: [%s]. Store Type: [%s]. Data Type: [%s].  ",ds.tmpOrdinal, ds.id, ds.name, ds.storeType, ds.dataType));
         ArrayList<KeyValuePair<String,String>> dsIds = _opEnv.getArguments().ParseDatasetIDs();
         //locating dataset by id
         if(dsIds.size()>0)
@@ -123,6 +123,7 @@ public class Query {
                                 datasetInstanceClass,
                                 datasetId);
 
+                //todo: the current implementation copies only the location from the dataset instance, however it should be using other info too (e.g. credential pointers ? )
                 location = dataSetInstance.getRefLocation();
             }
         }

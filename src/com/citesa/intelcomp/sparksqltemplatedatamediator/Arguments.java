@@ -98,7 +98,7 @@ public class Arguments extends ProgramArgumentsBase {
     protected ArrayList<KeyValuePair<String, String>> _parsedOutputLocations;
     public ArrayList<KeyValuePair<String, String>> ParseOutputLocations() {
         if(_parsedOutputLocations == null)
-            _parsedOutputLocations  = ProgramArgumentsBase.ParseCombinedArguments(this.datasetLocations);
+            _parsedOutputLocations  = ProgramArgumentsBase.ParseCombinedArguments(this.outputLocations);
         return _parsedOutputLocations;
     }
 
