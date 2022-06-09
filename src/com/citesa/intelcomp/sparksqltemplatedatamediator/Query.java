@@ -1,12 +1,20 @@
 package com.citesa.intelcomp.sparksqltemplatedatamediator;
 
+import com.citesa.intelcomp.cataloguehelper.CatalogueAccess;
+import com.citesa.intelcomp.cataloguehelper.DatasetInstanceBase;
+import com.citesa.intelcomp.cataloguehelper.DatasetResource;
+import com.citesa.intelcomp.clienttoolkit.ProgramArgumentsBase;
 import com.citesa.trivials.NotImplementedException;
+import com.citesa.trivials.config.ConfigXml;
 import com.citesa.trivials.io;
 import com.citesa.intelcomp.infrahelper.SimpleFileReader;
 import com.citesa.intelcomp.infrahelper.SimpleFileReaderBase;
 import com.citesa.spark.sqlcomposer.*;
 
 import com.citesa.trivials.string;
+import com.citesa.trivials.types.KeyValuePair;
+import org.apache.log4j.Level;
+import org.apache.log4j.Priority;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -14,7 +22,10 @@ import org.apache.spark.sql.SparkSession;
 import org.w3c.dom.*;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class Query {
@@ -25,78 +36,143 @@ public class Query {
         this._opEnv = opEnv;
     }
 
-    public Dataset<Row> getDataSet(SparkSession spark) throws Exception {
+    public void ExecuteQuery(SparkSession spark) throws Exception {
 
-        SparkSqlTemplate sprkSqlTmpl = GetSparkSqlTemplate();
+        //Read template
+        SparkSqlTemplate sparkSqlTemplate = InitSparkSqlTemplate();
 
-        HashMap<String,String> args = _opEnv.getArguments().getSupplementaryArguments();
-        for (String key: args.keySet()) {
-            try {
-                String value = args.get(key);
-                sprkSqlTmpl.addArgument( key, value );
-            }
-            catch(IllegalArgumentException exIllegalArg)
-            {
-                //ignore the exception
-            }
+
+        //Pass command line arguments to query engine
+
+        ArrayList<KeyValuePair<String,String>> args  =this._opEnv.getArguments().ParseQueryArguments();
+        for (KeyValuePair<String,String> arg: args ) {
+            if(!string.isNullOrEmpty((arg.key)))
+                sparkSqlTemplate.addArgument(arg.key, arg.value);
         }
 
+
         //Prepare data sources
-        for (DataSource ds : sprkSqlTmpl.dataSources.values()) {
+        int ordinal=0;
+        for (DataSource ds : sparkSqlTemplate.dataSources.values()) {
+            ds.tmpOrdinal = ordinal++;
            PrepareDataSource(spark, ds);
         }
 
         //Prepare data sinks
-        for (DataSink ds : sprkSqlTmpl.dataSinks.values()) {
+        ordinal = 0;
+        for (DataSink ds : sparkSqlTemplate.dataSinks.values()) {
+            ds.tmpOrdinal = ordinal++;
             PrepareDataSink(spark, ds);
         }
 
-        HashMap<String, Dataset<Row>>  datasets = sprkSqlTmpl.PrepareAll(spark);
-        Dataset<Row> dataset = null;
-        for (String key :
-             datasets.keySet()) {
-            dataset = datasets.get((key));
-            if (dataset != null) {
-                //TODO: handle multi-datasets. Currently only the first non-null dataset is retrieved by StandardQuery
-                break;
-            }
-        }
-        return dataset;
+        HashMap<String, Dataset<Row>>  datasets = sparkSqlTemplate.PrepareAll(spark);
+        sparkSqlTemplate.DepositData(spark , datasets);
     }
     private void PrepareDataSink(SparkSession spark, DataSink ds)
     {
         //TODO: add code to prepare datasink parameters.
-        //      Currenty DataSinks are not utilized as the storage is tackled by the Mediator logic,
-        //      i.e. not the one of the sink
+        _opEnv.getLogger().log(Level.INFO, String.format("Preparing DataSink #%d [%s]",ds.tmpOrdinal, ds.id));
+        ArrayList<KeyValuePair<String,String>> outlocations = _opEnv.getArguments().ParseOutputLocations();
+        String location = ProgramArgumentsBase.GetParsedArgumentValueByKeyOrOrdinal(outlocations,ds.id, ds.tmpOrdinal);
+        if(location == null )
+        {
+            _opEnv.getLogger().log(Level.INFO,
+                    String.format("DataSink [%s] (#%d) location is not declared as argument. Provided [%s] is used.",ds.id, ds.tmpOrdinal, ds.location ));
+        }
+        else
+        {
+            ds.location = location;
+            _opEnv.getLogger().log(Level.INFO,
+                    String.format("DataSink [%s] (#%d) location is set to [%s].",ds.id, ds.tmpOrdinal, ds.location ));
+        }
     }
     private void PrepareDataSource(SparkSession spark, DataSource ds)
     {
-        //TODO: add more code to prepare datasource parameters
+        //TODO: add code to prepare datasource parameters
+        String location = null;
+        _opEnv.getLogger().log(Level.INFO, String.format("Preparing DataSource #%d [%s]",ds.tmpOrdinal, ds.id));
+        ArrayList<KeyValuePair<String,String>> dsIds = _opEnv.getArguments().ParseDatasetIDs();
         //locating dataset by id
-        com.citesa.intelcomp.cataloguehelper.DatasetInstanceBase dataSetInstance = null;
-        if(!string.isNullOrEmpty(ds.dataType))
+        if(dsIds.size()>0)
         {
-            if(!ds.dataType.equals(dataSetInstance.getDatasetType()))
-            {
-                throw new IllegalArgumentException("Dataset type requested as '"+ ds.dataType+"' but instead '"+dataSetInstance.getDatasetType() +"' was found in the catalogue!");
+            String datasetId = null;
+            if(dsIds.size() == 1  )
+                datasetId = dsIds.get(0).value;
+            else {
+                datasetId = ProgramArgumentsBase.GetParsedArgumentValueByKeyOrOrdinal(
+                    dsIds, ds.id, ds.tmpOrdinal
+                );
+            }
+            if(!string.isNullOrEmpty( datasetId)) {
+                this._opEnv.getLogger().log(Level.INFO, String.format("DataSource [%s] (#%d) is assigned to dataset [%s].", ds.id,ds.tmpOrdinal, datasetId));
+                com.citesa.intelcomp.cataloguehelper.DatasetInstanceBase dataSetInstance = null;
+                Class datasetInstanceClass =null;
+                try {
+                    if(!string.isNullOrEmpty(ds.dataType))
+                        datasetInstanceClass = Class.forName(ds.dataType);
+                }
+                catch (Exception ex) {
+                    this._opEnv.getLogger().log(Level.WARN, String.format("Could not instantiate %s datatype of DataSource [%s] for reading catalogue dataset.", ds.dataType, ds.id ), ex);
+                }
+                if(datasetInstanceClass == null) {
+                    datasetInstanceClass = com.citesa.intelcomp.cataloguehelper.datasettypes.GenericFileFolderBasedDataset.class;
+                    this._opEnv.getLogger().log(Level.WARN, String.format("No datatype was declared for DataSource [%s].", ds.id));
+                }
+                dataSetInstance = (DatasetInstanceBase) new CatalogueAccess(_opEnv.getConfigManager())
+                        .getDatasetDescription(
+                                datasetInstanceClass,
+                                datasetId);
+
+                location = dataSetInstance.getRefLocation();
             }
         }
-        if(dataSetInstance != null )
-            ds.location = dataSetInstance.getRefLocation();
+        if(location == null)
+        {
+            location = ProgramArgumentsBase.GetParsedArgumentValueByKeyOrOrdinal(
+                    _opEnv.getArguments().ParseDatasetLocations(), ds.id, ds.tmpOrdinal
+            );
+        }
+        if(location!=null) {
+            ds.location = location;
+            _opEnv.getLogger().log(Level.INFO, String.format("DataSource [%s] (#%d) location is set to [%s]", ds.id, ds.tmpOrdinal, ds.location));
+        }
+        else
+        {
+            _opEnv.getLogger().log(Level.WARN, String.format("No location was identified for DataSource [%s] (#%d)", ds.id, ds.tmpOrdinal));
+        }
     }
 
-    private SparkSqlTemplate GetSparkSqlTemplate() throws URISyntaxException, IOException {
+    private SparkSqlTemplate InitSparkSqlTemplate() throws URISyntaxException, IOException {
 
+        _opEnv.getLogger().log(Level.INFO, String.format("Reading query template from [%s]", _opEnv.getArguments().queryTemplateFile));
         SimpleFileReader fr =  SimpleFileReaderBase.getFileReader(
-                io.PathToURI( _opEnv.getArguments().queryTemplate)
+                io.PathToURI( _opEnv.getArguments().queryTemplateFile)
         );
         String xmlText = fr.getFileContentString();
         Document xmlDoc =  com.citesa.trivials.xml.xmlDocFromString(xmlText);
         Element docElement = xmlDoc.getDocumentElement();
-        return  new SparkSqlTemplate( docElement);
+        SparkSqlTemplate tmpl =  new SparkSqlTemplate( docElement);
+
+        String configFile = _opEnv.getArguments().queryTemplateArgumentsFile;
+        if(!string.isNullOrEmpty(configFile)) {
+
+            if (configFile.endsWith(".xml")) {
+                ConfigXml xCfg = null;
+
+                xCfg = new ConfigXml();
+                _opEnv.getLogger().log(Level.INFO, String.format("Reading query arguments from [%s]", configFile));
+                xCfg.Load(SimpleFileReaderBase.readAllFileText(new URI(configFile)));
+
+                Collection<String> fArgs = xCfg.getNodeNames("queryArguments");
+                for (String arg : fArgs) {
+                    String value = xCfg.getValue("queryArguments/" + arg);
+                    _opEnv.getLogger().log( Level.INFO, String.format("QueryArgument from file: [%s] =  %s", arg, value));
+                    tmpl.getArguments().put(arg, value);
+                }
+                //arg_explain = (xCfg.getValue("programArguments/explain") =="1");
+            }
+        }
+        return tmpl ;
     }
 
-    public void StoreDataSet(SparkSession spark, Dataset<Row> dsOut) {
-        throw new NotImplementedException();
-    }
 }
