@@ -71,8 +71,6 @@ public class Arguments extends ProgramArgumentsBase {
     @Option(name = "-explain",usage = "Explain query")
     public String explainQuery = null;
 
-
-
     protected  ArrayList<KeyValuePair<String, String>> _parsedQueryArguments;
     public ArrayList<KeyValuePair<String, String>> ParseQueryArguments() {
         if(_parsedQueryArguments == null)

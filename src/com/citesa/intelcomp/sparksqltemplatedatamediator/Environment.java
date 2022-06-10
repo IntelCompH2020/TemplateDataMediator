@@ -31,8 +31,8 @@ public class Environment extends OperationEnvironmentBase  {
 		return info;
 	}
 
-	public Environment(Arguments arguments, String appId, Logger logger) {
-		super(arguments, appId, logger);
+	public Environment(Arguments arguments, String appId) {
+		super(arguments, appId);
 	}
 
 	public Arguments getArguments()
