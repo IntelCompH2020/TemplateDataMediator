@@ -45,7 +45,7 @@ public class Query {
 
         ArrayList<KeyValuePair<String,String>> args  =this._opEnv.getArguments().ParseQueryArguments();
         for (KeyValuePair<String,String> arg: args ) {
-            com.citesa.intelcomp.Logging.getLog().logF(Level.INFO,"CLI query argument [%s] = [%s]", arg.key, arg.value);
+            Logging.getLog().logF(Level.INFO,"CLI query argument [%s] = [%s]", arg.key, arg.value);
             if(!string.isNullOrEmpty((arg.key)))
                 sparkSqlTemplate.addArgument(arg.key, arg.value);
         }
@@ -71,18 +71,18 @@ public class Query {
     private void PrepareDataSink(SparkSession spark, DataSink ds)
     {
         //TODO: add code to prepare datasink parameters.
-        com.citesa.intelcomp.Logging.getLog().logF(Level.INFO, "Preparing DataSink #%d [%s]",ds.tmpOrdinal, ds.id);
+        Logging.getLog().logF(Level.INFO, "Preparing DataSink #%d [%s]",ds.tmpOrdinal, ds.id);
         ArrayList<KeyValuePair<String,String>> outlocations = _opEnv.getArguments().ParseOutputLocations();
         String location = ProgramArgumentsBase.GetParsedArgumentValueByKeyOrOrdinal(outlocations,ds.id, ds.tmpOrdinal);
         if(location == null )
         {
-            com.citesa.intelcomp.Logging.getLog().logF(Level.INFO,
+            Logging.getLog().logF(Level.INFO,
                     "DataSink [%s] (#%d) location is not declared as argument. Provided [%s] is used.",ds.id, ds.tmpOrdinal, ds.location );
         }
         else
         {
             ds.location = location;
-            com.citesa.intelcomp.Logging.getLog().logF(Level.INFO,
+            Logging.getLog().logF(Level.INFO,
                     "DataSink [%s] (#%d) location is set to [%s].",ds.id, ds.tmpOrdinal, ds.location );
         }
     }
@@ -90,7 +90,7 @@ public class Query {
     {
         //TODO: add code to prepare datasource parameters
         String location = null;
-        com.citesa.intelcomp.Logging.getLog().logF(Level.INFO, "Preparing DataSource #%d [%s]. Name: [%s]. Store Type: [%s]. Data Type: [%s].  ",ds.tmpOrdinal, ds.id, ds.name, ds.storeType, ds.dataType);
+        Logging.getLog().logF(Level.INFO, "Preparing DataSource #%d [%s]. Name: [%s]. Store Type: [%s]. Data Type: [%s].  ",ds.tmpOrdinal, ds.id, ds.name, ds.storeType, ds.dataType);
         ArrayList<KeyValuePair<String,String>> dsIds = _opEnv.getArguments().ParseDatasetIDs();
         //locating dataset by id
         if(dsIds.size()>0)
@@ -104,7 +104,7 @@ public class Query {
                 );
             }
             if(!string.isNullOrEmpty( datasetId)) {
-                com.citesa.intelcomp.Logging.getLog().logF(Level.INFO, "DataSource [%s] (#%d) is assigned to dataset [%s].", ds.id,ds.tmpOrdinal, datasetId);
+                Logging.getLog().logF(Level.INFO, "DataSource [%s] (#%d) is assigned to dataset [%s].", ds.id,ds.tmpOrdinal, datasetId);
                 com.citesa.intelcomp.cataloguehelper.DatasetInstanceBase dataSetInstance = null;
                 Class datasetInstanceClass =null;
                 try {
@@ -112,11 +112,11 @@ public class Query {
                         datasetInstanceClass = Class.forName(ds.dataType);
                 }
                 catch (Exception ex) {
-                    com.citesa.intelcomp.Logging.getLog().getLogger().log(Level.WARN, String.format( "Could not instantiate %s datatype of DataSource [%s] for reading catalogue dataset.", ds.dataType, ds.id) , ex);
+                    Logging.getLog().getLogger().log(Level.WARN, String.format( "Could not instantiate %s datatype of DataSource [%s] for reading catalogue dataset.", ds.dataType, ds.id) , ex);
                 }
                 if(datasetInstanceClass == null) {
                     datasetInstanceClass = com.citesa.intelcomp.cataloguehelper.datasettypes.GenericFileFolderBasedDataset.class;
-                    com.citesa.intelcomp.Logging.getLog().logF(Level.WARN, "No datatype was declared for DataSource [%s].", ds.id);
+                    Logging.getLog().logF(Level.WARN, "No datatype was declared for DataSource [%s].", ds.id);
                 }
                 dataSetInstance = (DatasetInstanceBase) new CatalogueAccess(_opEnv.getConfigManager())
                         .getDatasetDescription(
@@ -135,17 +135,17 @@ public class Query {
         }
         if(location!=null) {
             ds.location = location;
-            com.citesa.intelcomp.Logging.getLog().logF(Level.INFO, "DataSource [%s] (#%d) location is set to [%s]", ds.id, ds.tmpOrdinal, ds.location);
+            Logging.getLog().logF(Level.INFO, "DataSource [%s] (#%d) location is set to [%s]", ds.id, ds.tmpOrdinal, ds.location);
         }
         else
         {
-            com.citesa.intelcomp.Logging.getLog().logF(Level.WARN, "No location was identified for DataSource [%s] (#%d)", ds.id, ds.tmpOrdinal);
+            Logging.getLog().logF(Level.WARN, "No location was identified for DataSource [%s] (#%d)", ds.id, ds.tmpOrdinal);
         }
     }
 
     private SparkSqlTemplate InitSparkSqlTemplate() throws URISyntaxException, IOException {
 
-        com.citesa.intelcomp.Logging.getLog().logF(Level.INFO, "Reading query template from [%s]", _opEnv.getArguments().queryTemplateFile);
+        Logging.getLog().logF(Level.INFO, "Reading query template from [%s]", _opEnv.getArguments().queryTemplateFile);
         SimpleFileReader fr =  SimpleFileReaderBase.getFileReader(
                 io.PathToURI( _opEnv.getArguments().queryTemplateFile)
         );
@@ -161,13 +161,13 @@ public class Query {
                 ConfigXml xCfg = null;
 
                 xCfg = new ConfigXml();
-                com.citesa.intelcomp.Logging.getLog().logF(Level.INFO, "Reading query arguments from [%s]", configFile);
+                Logging.getLog().logF(Level.INFO, "Reading query arguments from [%s]", configFile);
                 xCfg.Load(SimpleFileReaderBase.readAllFileText(new URI(configFile)));
 
                 Collection<String> fArgs = xCfg.getNodeNames("queryArguments");
                 for (String arg : fArgs) {
                     String value = xCfg.getValue("queryArguments/" + arg);
-                    com.citesa.intelcomp.Logging.getLog().logF(Level.INFO, "QueryArgument from file: [%s] =  %s", arg, value);
+                    Logging.getLog().logF(Level.INFO, "QueryArgument from file: [%s] =  %s", arg, value);
                     tmpl.getArguments().put(arg, value);
                 }
                 //arg_explain = (xCfg.getValue("programArguments/explain") =="1");

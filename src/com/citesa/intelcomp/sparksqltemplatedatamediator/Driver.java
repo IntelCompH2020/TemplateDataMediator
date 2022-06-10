@@ -18,8 +18,7 @@ public class Driver {
 
         Logger logger = Logger.getLogger("SparkSqlTemplateDataMediator");
         logger.setLevel(Level.INFO); //Initial level: INFO
-        com.citesa.intelcomp.Logging.setLog(new Log(logger));
-
+        Logging.setLog(new Log(logger));
 
         /* Preparing operation environment for the execution */
         Arguments opArguments = new Arguments(args);
