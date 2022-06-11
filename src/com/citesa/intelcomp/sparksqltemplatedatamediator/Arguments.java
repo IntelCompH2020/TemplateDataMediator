@@ -5,9 +5,11 @@ import com.citesa.intelcomp.clienttoolkit.ProgramArgumentsBase;
 import com.citesa.intelcomp.infrahelper.SimpleFileReaderBase;
 import com.citesa.trivials.config.ConfigJson;
 import com.citesa.trivials.config.ConfigXml;
+import com.citesa.trivials.logging.Log;
 import com.citesa.trivials.string;
 import com.citesa.trivials.types.KeyValuePair;
 import com.citesa.trivials.types.LogMessage;
+import org.apache.log4j.Level;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.spi.StringArrayOptionHandler;
@@ -100,16 +102,16 @@ public class Arguments extends ProgramArgumentsBase {
         return _parsedOutputLocations;
     }
 
-    public ArrayList<LogMessage> PrintInfo(boolean onlyLocal) {
-        ArrayList<LogMessage> info = new ArrayList<>();
-        info.add( new LogMessage("----Core Arguments----"));
+    public void LogInfo(boolean noCascading, Level level, Log logger) {
+        logger.logF(level,"----%s Arguments----", this.getClass().getName());
+        if(!noCascading)
+            super.LogInfo(noCascading, level,logger);
         /*
-        info.add( new LogMessage("Dataset Id : " + string.asPrintable( this.datasetId ) ));
-        info.add( new LogMessage("Dataset FS Location: " + string.asPrintable( this.datasetLocation) ));
-        info.add( new LogMessage("Output Location : " + string.asPrintable( this.outputLocation)));
-        info.add( new LogMessage("Output Mode : " + string.asPrintable( this.outMode )));
+        logger.logF(level,"Dataset Id : " + string.asPrintable( this.datasetId ) ));
+        logger.logF(level,"Dataset FS Location: " + string.asPrintable( this.datasetLocation) ));
+        logger.logF(level,"Output Location : " + string.asPrintable( this.outputLocation)));
+        logger.logF(level,"Output Mode : " + string.asPrintable( this.outMode )));
          */
-        return  info;
     }
 
     public String getQueryExplanation() {

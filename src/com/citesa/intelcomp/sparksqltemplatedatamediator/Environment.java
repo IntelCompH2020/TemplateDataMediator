@@ -4,7 +4,9 @@ package com.citesa.intelcomp.sparksqltemplatedatamediator;
 import com.citesa.intelcomp.clienttoolkit.OperationEnvironmentBase;
 import com.citesa.trivials.NotImplementedException;
 import com.citesa.trivials.io;
+import com.citesa.trivials.logging.Log;
 import com.citesa.trivials.types.LogMessage;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.time.LocalDateTime;
@@ -14,21 +16,19 @@ import java.util.UUID;
 
 public class Environment extends OperationEnvironmentBase  {
 
-	public ArrayList<LogMessage> PrintInfo(boolean onlyLocal) {
-		ArrayList<LogMessage> info = new ArrayList<>();
-		info.add( new LogMessage("----Operation Environment----"));
-		info.add( new LogMessage("Config : " + getPointZeroRef()));
-		info.add( new LogMessage("Catalogue : " + getConfigManager().getCatalogueEndpoint()));
+	public void LogInfo(boolean noCascading, Level level, Log logger){
+		logger.logF(level,"----Operation Environment----");
+		logger.logF(level,"Config : [%s]" , getPointZeroRef());
+		logger.logF(level,"Catalogue : [%s]" , getConfigManager().getCatalogueEndpoint());
 		/*
-		info.add( new LogMessage("Dataset Id : " + getDatasetId()));
-		info.add( new LogMessage("Dataset Location: " + getDatasetFSLocation()));
-		info.add( new LogMessage("Output Location : " + getOutputLocation()));
-		info.add( new LogMessage("Output Mode : " + getOutputMode()));
+		logger.logF(level,"Dataset Id : " + getDatasetId()));
+		logger.logF(level,"Dataset Location: " + getDatasetFSLocation()));
+		logger.logF(level,"Output Location : " + getOutputLocation()));
+		logger.logF(level,"Output Mode : " + getOutputMode()));
 		*/
-		if(!onlyLocal)
-			info.addAll(getArguments().PrintInfo( false ));
+		if(!noCascading)
+			getArguments().LogInfo( false, level,logger );
 
-		return info;
 	}
 
 	public Environment(Arguments arguments, String appId) {

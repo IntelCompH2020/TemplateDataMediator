@@ -112,7 +112,7 @@ public class Query {
                         datasetInstanceClass = Class.forName(ds.dataType);
                 }
                 catch (Exception ex) {
-                    Logging.getLog().getLogger().log(Level.WARN, String.format( "Could not instantiate %s datatype of DataSource [%s] for reading catalogue dataset.", ds.dataType, ds.id) , ex);
+                    Logging.getLog().logAndPrintException(Level.WARN, ex, "Could not instantiate %s datatype of DataSource [%s] for reading catalogue dataset.", ds.dataType, ds.id);
                 }
                 if(datasetInstanceClass == null) {
                     datasetInstanceClass = com.citesa.intelcomp.cataloguehelper.datasettypes.GenericFileFolderBasedDataset.class;
