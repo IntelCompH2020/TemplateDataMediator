@@ -28,6 +28,7 @@ public class Driver {
 
                 //Preparing processing components
         opEnv = new Environment(opArguments, appId);
+        logger.setLevel(Log.toLogLevel( opEnv.getLogLevel())); //Initial level: INFO
         Query query = new Query(opEnv);
 
         Logging.getLog().logF(Level.INFO, "======Starting %s driver execution======", appId);

@@ -3,6 +3,7 @@ package com.citesa.intelcomp.sparksqltemplatedatamediator;
 
 import com.citesa.intelcomp.clienttoolkit.ProgramArgumentsBase;
 import com.citesa.intelcomp.infrahelper.SimpleFileReaderBase;
+import com.citesa.trivials.args.SimpleParser;
 import com.citesa.trivials.config.ConfigJson;
 import com.citesa.trivials.config.ConfigXml;
 import com.citesa.trivials.logging.Log;
@@ -76,14 +77,14 @@ public class Arguments extends ProgramArgumentsBase {
     protected  ArrayList<KeyValuePair<String, String>> _parsedQueryArguments;
     public ArrayList<KeyValuePair<String, String>> ParseQueryArguments() {
         if(_parsedQueryArguments == null)
-            _parsedQueryArguments =  ProgramArgumentsBase.ParseCombinedArguments(this.queryArguments);
+            _parsedQueryArguments =  SimpleParser.ParseCombinedArguments(this.queryArguments);
         return _parsedQueryArguments;
     }
 
     protected  ArrayList<KeyValuePair<String, String>> _parsedDatasetIds;
     public ArrayList<KeyValuePair<String, String>> ParseDatasetIDs() {
         if( _parsedDatasetIds == null )
-            _parsedDatasetIds =  ProgramArgumentsBase.ParseCombinedArguments(this.datasetIds);
+            _parsedDatasetIds =  SimpleParser.ParseCombinedArguments(this.datasetIds);
         return _parsedDatasetIds;
     }
 
@@ -91,14 +92,14 @@ public class Arguments extends ProgramArgumentsBase {
     protected  ArrayList<KeyValuePair<String, String>> _parsedDatasetLocations;
     public ArrayList<KeyValuePair<String, String>> ParseDatasetLocations() {
         if(_parsedDatasetLocations == null)
-            _parsedDatasetLocations = ProgramArgumentsBase.ParseCombinedArguments(this.datasetLocations);
+            _parsedDatasetLocations = SimpleParser.ParseCombinedArguments(this.datasetLocations);
         return _parsedDatasetLocations;
     }
 
     protected ArrayList<KeyValuePair<String, String>> _parsedOutputLocations;
     public ArrayList<KeyValuePair<String, String>> ParseOutputLocations() {
         if(_parsedOutputLocations == null)
-            _parsedOutputLocations  = ProgramArgumentsBase.ParseCombinedArguments(this.outputLocations);
+            _parsedOutputLocations  = SimpleParser.ParseCombinedArguments(this.outputLocations);
         return _parsedOutputLocations;
     }
 
