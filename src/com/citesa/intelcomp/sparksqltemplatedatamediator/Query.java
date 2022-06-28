@@ -164,10 +164,10 @@ public class Query {
                 Logging.getLog().logF(Level.INFO, "Reading query arguments from [%s]", configFile);
                 xCfg.Load(SimpleFileReaderBase.readAllFileText(new URI(configFile)));
 
-                Collection<String> fArgs = xCfg.getNodeNames("queryArguments");
+                Collection<String> fArgs = xCfg.getNodeNames("templateArguments");
                 for (String arg : fArgs) {
-                    String value = xCfg.getValue("queryArguments/" + arg);
-                    Logging.getLog().logF(Level.INFO, "QueryArgument from file: [%s] =  %s", arg, value);
+                    String value = xCfg.getValue("templateArguments/" + arg);
+                    Logging.getLog().logF(Level.INFO, "Template Argument from file: [%s] =  %s", arg, value);
                     tmpl.getArguments().put(arg, value);
                 }
                 //arg_explain = (xCfg.getValue("programArguments/explain") =="1");
