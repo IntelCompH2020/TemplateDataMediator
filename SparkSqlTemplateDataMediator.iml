@@ -9,6 +9,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="SparkSqlComposer" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.spark:spark-core_2.12:3.2.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.avro:avro:1.10.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.avro:avro-mapred:1.10.2" level="project" />
