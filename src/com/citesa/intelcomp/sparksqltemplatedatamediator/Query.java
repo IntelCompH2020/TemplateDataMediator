@@ -42,7 +42,6 @@ public class Query {
         SparkSqlTemplate sparkSqlTemplate = InitSparkSqlTemplate();
 
         //Pass command line arguments to query engine
-
         ArrayList<KeyValuePair<String,String>> args  =this._opEnv.getArguments().ParseQueryArguments();
         for (KeyValuePair<String,String> arg: args ) {
             Logging.getLog().logF(Level.INFO,"CLI query argument [%s] = [%s]", arg.key, arg.value);
@@ -50,23 +49,19 @@ public class Query {
                 sparkSqlTemplate.addArgument(arg.key, arg.value);
         }
 
-
         //Prepare data sources
-        int ordinal=0;
         for (DataSource ds : sparkSqlTemplate.dataSources.values()) {
-            ds.tmpOrdinal = ordinal++;
             PrepareDataSource(spark, ds);
         }
 
         //Prepare data sinks
-        ordinal = 0;
         for (DataSink ds : sparkSqlTemplate.dataSinks.values()) {
-            ds.tmpOrdinal = ordinal++;
             PrepareDataSink(spark, ds);
         }
 
-        HashMap<String, Dataset<Row>>  datasets = sparkSqlTemplate.PrepareAll(spark);
-        sparkSqlTemplate.DepositData(spark , datasets);
+        sparkSqlTemplate.Execute(spark);
+        //HashMap<String, Dataset<Row>>  datasets = sparkSqlTemplate.PrepareAll(spark);
+        //sparkSqlTemplate.DepositData(spark , datasets);
     }
     private void PrepareDataSink(SparkSession spark, DataSink ds)
     {
