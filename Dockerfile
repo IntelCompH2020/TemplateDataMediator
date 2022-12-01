@@ -20,7 +20,7 @@ RUN mvn clean install -DskipTests
 
 #Build TemplateDataMediator
 WORKDIR /build/TemplateDataMediator/
-RUN mvn clean package -DskipTests
+RUN mvn clean package -Drevision=${BUILD_VERSION} -DskipTests
 
 ARG CREPO_BINARIES_REPO_URL
 ARG CREPO_BINARIES_CREDENTIAL
@@ -32,4 +32,4 @@ ENV BUILD_VERSION=$BUILD_VERSION
 RUN curl --location --request PUT "${CREPO_BINARIES_REPO_URL}intelcomp/mediators/TemplateDataMediator/TemplateDataMediator-${BUILD_VERSION}.jar" \
 --header "Authorization: Basic ${CREPO_BINARIES_CREDENTIAL}" \
 --header "Content-Type: application/json" \
---data-binary "@/build/TemplateDataMediator/target/TemplateDataMediator-1.0-SNAPSHOT-jar-with-dependencies.jar"
+--data-binary "@/build/TemplateDataMediator/target/SparkSqlTemplateDataMediator-${BUILD_VERSION}-jar-with-dependencies.jar"
