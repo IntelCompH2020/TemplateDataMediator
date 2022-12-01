@@ -6,6 +6,13 @@ COPY SparkSQLComposer /build/SparkSQLComposer/
 COPY InfraHelperLib /build/InfraHelperLib/
 COPY TemplateDataMediator /build/TemplateDataMediator/
 
+ARG CREPO_BINARIES_REPO_URL
+ARG CREPO_BINARIES_CREDENTIAL
+ARG BUILD_VERSION
+ENV CREPO_BINARIES_REPO_URL=$CREPO_BINARIES_REPO_URL
+ENV CREPO_BINARIES_CREDENTIAL=$CREPO_BINARIES_CREDENTIAL
+ENV BUILD_VERSION=$BUILD_VERSION
+
 #Build JavaTrivialsToolkit
 WORKDIR /build/JavaTrivialsToolkit/
 RUN mvn clean install -DskipTests
@@ -21,13 +28,6 @@ RUN mvn clean install -DskipTests
 #Build TemplateDataMediator
 WORKDIR /build/TemplateDataMediator/
 RUN mvn clean package -Drevision=${BUILD_VERSION} -DskipTests
-
-ARG CREPO_BINARIES_REPO_URL
-ARG CREPO_BINARIES_CREDENTIAL
-ARG BUILD_VERSION
-ENV CREPO_BINARIES_REPO_URL=$CREPO_BINARIES_REPO_URL
-ENV CREPO_BINARIES_CREDENTIAL=$CREPO_BINARIES_CREDENTIAL
-ENV BUILD_VERSION=$BUILD_VERSION
 
 RUN curl --location --request PUT "${CREPO_BINARIES_REPO_URL}intelcomp/mediators/TemplateDataMediator/TemplateDataMediator-${BUILD_VERSION}.jar" \
 --header "Authorization: Basic ${CREPO_BINARIES_CREDENTIAL}" \
