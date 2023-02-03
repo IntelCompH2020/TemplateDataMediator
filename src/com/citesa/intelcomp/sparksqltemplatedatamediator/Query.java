@@ -2,9 +2,7 @@ package com.citesa.intelcomp.sparksqltemplatedatamediator;
 
 import com.citesa.intelcomp.cataloguehelper.CatalogueAccess;
 import com.citesa.intelcomp.cataloguehelper.DatasetInstanceBase;
-import com.citesa.intelcomp.cataloguehelper.DatasetResource;
 import com.citesa.intelcomp.clienttoolkit.ProgramArgumentsBase;
-import com.citesa.trivials.NotImplementedException;
 import com.citesa.trivials.config.ConfigXml;
 import com.citesa.trivials.io;
 import com.citesa.intelcomp.infrahelper.SimpleFileReader;
@@ -14,9 +12,6 @@ import com.citesa.spark.sqlcomposer.*;
 import com.citesa.trivials.string;
 import com.citesa.trivials.types.KeyValuePair;
 import org.apache.log4j.Level;
-import org.apache.log4j.Priority;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
 import org.w3c.dom.*;
@@ -26,7 +21,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 
 public class Query {
     protected com.citesa.intelcomp.sparksqltemplatedatamediator.Environment _opEnv;

@@ -2,22 +2,14 @@ package com.citesa.intelcomp.sparksqltemplatedatamediator;
 
 
 import com.citesa.intelcomp.clienttoolkit.ProgramArgumentsBase;
-import com.citesa.intelcomp.infrahelper.SimpleFileReaderBase;
 import com.citesa.trivials.args.SimpleParser;
-import com.citesa.trivials.config.ConfigJson;
-import com.citesa.trivials.config.ConfigXml;
 import com.citesa.trivials.logging.Log;
-import com.citesa.trivials.string;
 import com.citesa.trivials.types.KeyValuePair;
-import com.citesa.trivials.types.LogMessage;
 import org.apache.log4j.Level;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.*;
 
 public class Arguments extends ProgramArgumentsBase {
