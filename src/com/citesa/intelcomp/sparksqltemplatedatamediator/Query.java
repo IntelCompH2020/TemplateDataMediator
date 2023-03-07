@@ -5,8 +5,8 @@ import com.citesa.intelcomp.cataloguehelper.DatasetInstanceBase;
 import com.citesa.intelcomp.clienttoolkit.ProgramArgumentsBase;
 import com.citesa.trivials.config.ConfigXml;
 import com.citesa.trivials.io;
-import com.citesa.intelcomp.infrahelper.SimpleFileReader;
-import com.citesa.intelcomp.infrahelper.SimpleFileReaderBase;
+import com.citesa.intelcomp.infrahelper.filereader.SimpleFileReader;
+import com.citesa.intelcomp.infrahelper.filereader.SimpleFileReaderBase;
 import com.citesa.spark.sqlcomposer.*;
 
 import com.citesa.trivials.string;
@@ -54,6 +54,7 @@ public class Query {
         }
 
         sparkSqlTemplate.Execute(spark);
+        CacheManager.clearCache(sparkSqlTemplate.getCacheMatadataPath(), sparkSqlTemplate.cacheHashes);
         //HashMap<String, Dataset<Row>>  datasets = sparkSqlTemplate.PrepareAll(spark);
         //sparkSqlTemplate.DepositData(spark , datasets);
     }

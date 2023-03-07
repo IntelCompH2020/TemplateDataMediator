@@ -9,8 +9,8 @@
     <version>${revision}</version>
 
     <properties>
-        <revision>1.1.0</revision>
-        <infratoolkit.version>0.0.2</infratoolkit.version>
+        <revision>1.1.1</revision>
+        <infratoolkit.version>0.0.3</infratoolkit.version>
         <clienttoolkit.version>0.0.2</clienttoolkit.version>
     </properties>
 
@@ -181,7 +181,7 @@
         <dependency>
             <groupId>com.citesa.intelcomp</groupId>
             <artifactId>InfraHelperLib</artifactId>
-            <version>0.0.2</version>
+            <version>0.0.3</version>
         </dependency>
         <dependency>
             <groupId>com.citesa.intelcomp</groupId>
@@ -192,7 +192,7 @@
         <dependency>
             <groupId>com.citesa</groupId>
             <artifactId>SparkSqlComposer</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1</version>
         </dependency>
     </dependencies>
 </project>
