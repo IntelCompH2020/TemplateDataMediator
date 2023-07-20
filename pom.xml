@@ -9,7 +9,7 @@
     <version>${revision}</version>
 
     <properties>
-        <revision>1.1.1</revision>
+        <revision>1.1.2</revision>
         <infratoolkit.version>0.0.3</infratoolkit.version>
         <clienttoolkit.version>0.0.2</clienttoolkit.version>
     </properties>
@@ -192,7 +192,7 @@
         <dependency>
             <groupId>com.citesa</groupId>
             <artifactId>SparkSqlComposer</artifactId>
-            <version>1.1.1</version>
+            <version>1.1.2</version>
         </dependency>
     </dependencies>
 </project>
