@@ -44,6 +44,8 @@ public class Driver {
                 spark.sparkContext().setLogLevel(opEnv.getLogLevel());
             }
 
+            spark.sparkContext().hadoopConfiguration().set("mapreduce.fileoutputcommitter.marksuccessfuljobs", "false");
+
             Logging.getLog().logF(Level.INFO, "======Starting %s query execution as application [%s] ======", appId, appId);
             query.ExecuteQuery(spark);
         }
